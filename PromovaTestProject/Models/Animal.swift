@@ -8,7 +8,7 @@
 import Foundation
 
 struct Animal: Decodable, Identifiable, Equatable {
-    var id: UUID = UUID()
+    var id: String = UUID().uuidString
 
     let title: String
     let description: String
@@ -45,12 +45,31 @@ struct AnimalContent: Decodable, Equatable {
     let image: String
 }
 
+// MARK: Transformation CoreData to Local
+extension Animal {
+    init(animalMO: AnimalMO) {
+        title = animalMO.title ?? ""
+        description = animalMO.descriptionTitle ?? ""
+        image = animalMO.image ?? ""
+        order = Int(animalMO.order)
+        status = animalMO.statusEnum
+        content = animalMO.contentArray.map(AnimalContent.init)
+    }
+}
+
+extension AnimalContent {
+    init(animalContentMO: AnimalContentMO) {
+        fact = animalContentMO.fact ?? ""
+        image = animalContentMO.image ?? ""
+    }
+}
+
 // MARK: Mock
 extension Animal {
     static func mock(maxIndex: Int) -> [Animal] {
         (0...maxIndex).map { index in
             .init(
-                id: UUID(),
+                id: UUID().uuidString,
                 title: "Dogs 🐕 \(index)",
                 description: "Different facts about dogs",
                 image: "https://upload.wikimedia.org/wikipedia/commons/2/2b/WelshCorgi.jpeg",

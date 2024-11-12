@@ -19,11 +19,13 @@ struct AnimalHomeFeature {
     }
     enum Action {
         case homeDidAppear
+        case refreshDidEnd
         case animalResponse(Result<IdentifiedArrayOf<Animal>, Error>)
     }
 
     enum ViewState: Equatable {
         case none
+        case empty
         case loading
         case error(String)
         case fetched(IdentifiedArrayOf<Animal>)
@@ -32,14 +34,14 @@ struct AnimalHomeFeature {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .homeDidAppear:
+            case .homeDidAppear, .refreshDidEnd:
                 return .run { send in
-                    try await send(.animalResponse(.success(environment.animalAPIService.fetchAnimal())))
+                    try await send(.animalResponse(.success(environment.animalCachedService.fetchAnimals())))
                 } catch: { error, send in
                     await send(.animalResponse(.failure(error)))
                 }
             case .animalResponse(.success(let animals)):
-                state.viewState = .fetched(animals)
+                state.viewState = animals.isEmpty ? .empty : .fetched(animals)
 
                 return .none
 

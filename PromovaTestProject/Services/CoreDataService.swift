@@ -10,12 +10,17 @@ import CoreData
 import OSLog
 
 protocol CoreDataServiceProtocol {
-    func fetch<T: NSManagedObject>(request: NSFetchRequest<T>) -> [T]?
-    func saveChanges()
+    var backgroundObjectContext: NSManagedObjectContext { get }
+
+    func fetch<T: NSManagedObject>(request: NSFetchRequest<T>) throws -> [T]?
+    func fetchInBackground<T: NSManagedObject>(request: NSFetchRequest<T>) throws -> [T]?
+    func numberOfElements<T: NSManagedObject>(for fetchRequest: NSFetchRequest<T>) throws -> Int
+    func saveChanges() throws
+    func saveBGChanges() throws
 }
 
-private let logger = Logger(subsystem: "CoreDataService", category: "CoreDataService")
-private let modelFileName: String = "PromovaTestProject"
+private let logger = Logger(subsystem: "PromovaTestProject", category: "CoreDataService")
+private let modelFileName: String = "Promova"
 
 final class CoreDataService: NSPersistentContainer, CoreDataServiceProtocol, @unchecked Sendable {
 
@@ -51,26 +56,32 @@ final class CoreDataService: NSPersistentContainer, CoreDataServiceProtocol, @un
 
 extension CoreDataService {
 
-    func fetch<T: NSManagedObject>(request: NSFetchRequest<T>) -> [T]? {
-        do {
-            return try viewContext.fetch(request)
-        } catch {
-            logger.error("\(error)")
-            return nil
-        }
+    func fetch<T: NSManagedObject>(request: NSFetchRequest<T>) throws -> [T]? {
+         try viewContext.fetch(request)
     }
 
+    func fetchInBackground<T: NSManagedObject>(request: NSFetchRequest<T>) throws -> [T]? {
+        try backgroundObjectContext.fetch(request)
+    }
 
-    func saveChanges() {
+    func numberOfElements<T: NSManagedObject>(for fetchRequest: NSFetchRequest<T>) throws -> Int {
+        try backgroundObjectContext.count(for: fetchRequest)
+    }
+
+    func saveChanges() throws {
         guard viewContext.hasChanges else {
             return
         }
 
-        do {
-            try viewContext.save()
-        } catch {
-            logger.error("\(error)")
+        try viewContext.save()
+    }
+
+    func saveBGChanges() throws {
+        guard backgroundObjectContext.hasChanges else {
+            return
         }
+
+        try backgroundObjectContext.save()
     }
 }
 

@@ -8,5 +8,5 @@
 import Dependencies
 
 struct AnimalHomeEnvironment {
-    @Dependency(\.animalAPIService) var animalAPIService
+    @Dependency(\.animalCachedService) var animalCachedService
 }

@@ -25,6 +25,10 @@ private extension AnimalHomeView {
     @ViewBuilder
     var content: some View {
         switch store.viewState {
+        case .empty:
+            Text("There are no new items, please try requesting later")
+                .font(.basicTitle)
+                .foregroundStyle(.appBlack)
         case .error(let error):
             VStack(spacing: 16) {
                 Image(systemName: "exclamationmark.triangle.fill")
@@ -35,6 +39,9 @@ private extension AnimalHomeView {
             }
         case .fetched(let animals):
             listView(animals: animals)
+                .refreshable {
+                    store.send(.refreshDidEnd)
+                }
         case .loading:
             listView(animals: .init(uniqueElements: Animal.mock(maxIndex: 10)))
                 .shimmer(when: true)
@@ -61,7 +68,7 @@ private extension AnimalHomeView {
 }
 
 #Preview {
-    AnimalHomeView(store: .init(initialState: AnimalHomeFeature.State(viewState: .loading)) {
+    AnimalHomeView(store: .init(initialState: AnimalHomeFeature.State(viewState: .empty)) {
         AnimalHomeFeature()
     })
 }

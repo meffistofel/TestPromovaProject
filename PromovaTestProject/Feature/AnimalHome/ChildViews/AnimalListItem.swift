@@ -93,7 +93,7 @@ private extension AnimalListItem {
 // MARK: - Local model
 extension AnimalListItem {
     struct Model {
-        let id: UUID
+        let id: String
         let title: String
         let description: String
         let image: String

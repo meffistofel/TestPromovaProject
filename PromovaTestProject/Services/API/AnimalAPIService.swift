@@ -8,14 +8,14 @@
 import ComposableArchitecture
 
 protocol AnimalAPIServiceProtocol {
-    func fetchAnimal() async throws -> IdentifiedArrayOf<Animal>
+    func fetchAnimals() async throws -> [Animal]
 }
 
 final class AnimalAPIService: AnimalAPIServiceProtocol {
 
     @Dependency(\.networkService) private var networkService
 
-    func fetchAnimal() async throws -> IdentifiedArrayOf<Animal> {
+    func fetchAnimals() async throws -> [Animal] {
         try await networkService.call(.init(route: "/main/animals.json"))
     }
 }

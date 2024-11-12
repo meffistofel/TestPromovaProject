@@ -37,7 +37,7 @@
 		9D5526A62CE3A9E50066887B /* Exceptions for "PromovaTestProject" folder in "PromovaTestProject" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				"Resourсes/Info.plist",
 			);
 			target = 9D5526552CE391B80066887B /* PromovaTestProject */;
 		};
@@ -421,7 +421,7 @@
 				DEVELOPMENT_TEAM = X8W7PK99DR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = PromovaTestProject/Info.plist;
+				INFOPLIST_FILE = PromovaTestProject/Resources.Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -451,7 +451,7 @@
 				DEVELOPMENT_TEAM = X8W7PK99DR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = PromovaTestProject/Info.plist;
+				INFOPLIST_FILE = PromovaTestProject/Resources.Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -57,7 +57,11 @@ private extension AnimalHomeView {
     func listView(animals: IdentifiedArrayOf<Animal>) -> some View {
         List(animals) { animal in
             AnimalListItem(model: .init(model: animal))
-                .onTapGesture { }
+                .onTapGesture {
+                    if let content = animal.content {
+                        store.send(.delegate(.cellDidTap(content)))
+                    }
+                }
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
         }

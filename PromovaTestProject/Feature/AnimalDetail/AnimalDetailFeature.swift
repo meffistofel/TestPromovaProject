@@ -11,7 +11,7 @@ import ComposableArchitecture
 struct AnimalDetailFeature {
     @ObservableState
     struct State: Equatable {
-
+        let content: [AnimalContent]
     }
     enum Action {
         case none

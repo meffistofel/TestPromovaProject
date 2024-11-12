@@ -18,9 +18,14 @@ struct AnimalHomeFeature {
 
     }
     enum Action {
+        case delegate(Delegate)
         case homeDidAppear
         case refreshDidEnd
         case animalResponse(Result<IdentifiedArrayOf<Animal>, Error>)
+    }
+
+    enum Delegate: Equatable {
+        case cellDidTap([AnimalContent])
     }
 
     enum ViewState: Equatable {
@@ -48,6 +53,9 @@ struct AnimalHomeFeature {
             case .animalResponse(.failure(let error)):
                 state.viewState = .error(error.localizedDescription)
 
+                return .none
+
+            case .delegate:
                 return .none
             }
         }

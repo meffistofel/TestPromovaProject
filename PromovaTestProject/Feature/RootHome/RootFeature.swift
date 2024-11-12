@@ -34,7 +34,10 @@ struct RootFeature {
             switch action {
             case .path:
                 return .none
-            case .animalList(_):
+            case let .animalList(.delegate(.cellDidTap(animalContent))):
+                state.path.append(.detailItem(AnimalDetailFeature.State(content: animalContent)))
+                return .none
+            case .animalList:
                 return .none
             }
         }

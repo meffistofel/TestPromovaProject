@@ -16,7 +16,7 @@ struct RootHomeView: View {
         WithPerceptionTracking {
             NavigationStack(
                 path: $store.scope(state: \.path, action: \.path)) {
-                    EmptyView()
+                    AnimalHomeView(store: store.scope(state: \.animalList, action: \.animalList))
                 } destination: {
                     destinationView(store: $0)
                 }
@@ -26,8 +26,8 @@ struct RootHomeView: View {
     @ViewBuilder
     private func destinationView(store: Store<RootFeature.Path.State, RootFeature.Path.Action>) -> some View {
         switch store.case {
-        case .detailItem:
-            EmptyView()
+        case .detailItem(let store):
+            AnimalDetailView(store: store)
         }
     }
 }

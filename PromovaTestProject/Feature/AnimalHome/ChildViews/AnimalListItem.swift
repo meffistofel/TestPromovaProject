@@ -71,13 +71,13 @@ private extension AnimalListItem {
         Label(
             title: {
                 Text("Premium")
-                    .foregroundStyle(.appBlue)
                     .font(.basicTitle)
             },
             icon: {
                 Image(.imageLock)
             }
         )
+        .foregroundStyle(.appBlue)
         .labelStyle(.adaptive(spacing: 4))
     }
     var comingSoonView: some View {

@@ -35,7 +35,7 @@ final class NetworkingService: NetworkServiceProtocol {
             throw APIError.httpCode(code)
         }
 
-        let model = try JSONDecoder().decodeWithLogging(T.self, from: data)
+        let model = try JSONDecoder().decode(T.self, from: data)
 
         return model
     }

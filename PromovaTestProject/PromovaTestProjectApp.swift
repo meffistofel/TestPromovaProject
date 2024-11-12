@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 
 @main
 struct PromovaTestProjectApp: App {
+    let store: StoreOf<RootFeature> = RootFeature.initialStore
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootHomeView(store: store)
         }
     }
 }

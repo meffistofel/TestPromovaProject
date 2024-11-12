@@ -24,6 +24,8 @@ struct RootFeature {
         case detailItem(AnimalDetailFeature)
     }
 
+    static var initialStore: StoreOf<Self> = .init(initialState: Self.State()) { Self() }
+
     var body: some ReducerOf<Self> {
         Scope(state: \.animalList, action: \.animalList) {
             AnimalHomeFeature()

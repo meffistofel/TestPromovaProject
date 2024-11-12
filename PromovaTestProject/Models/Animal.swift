@@ -7,20 +7,30 @@
 
 import Foundation
 
-struct Animal: Decodable, Identifiable {
+struct Animal: Decodable, Identifiable, Equatable {
     var id: UUID = UUID()
+
     let title: String
     let description: String
     let image: String
     let order: Int
     let status: Status
-    let content: [AnimalContent]
+    var content: [AnimalContent]?
 
-    var contentIsAvailable: Bool {
-        !content.isEmpty
+    enum CodingKeys: String, CodingKey {
+        case title
+        case description
+        case image
+        case order
+        case status
+        case content
     }
 
-    enum Status: Decodable, CaseIterable {
+    var contentIsAvailable: Bool {
+        (content?.isEmpty ?? true) == false
+    }
+
+    enum Status: String, Decodable, CaseIterable, Equatable {
         case paid
         case free
 
@@ -30,7 +40,7 @@ struct Animal: Decodable, Identifiable {
     }
 }
 
-struct AnimalContent: Decodable {
+struct AnimalContent: Decodable, Equatable {
     let fact: String
     let image: String
 }

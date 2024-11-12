@@ -19,6 +19,10 @@ private enum AnimalAPIServiceKey: DependencyKey {
     static let liveValue: AnimalAPIServiceProtocol = AnimalAPIService()
 }
 
+private enum CoreDataServiceKey: DependencyKey {
+    static let liveValue: CoreDataServiceProtocol = CoreDataService()
+}
+
 extension DependencyValues {
     var networkMonitoringService: NetworkMonitoringService {
         get { self[NetworkMonitoringServiceKey.self] }
@@ -33,6 +37,11 @@ extension DependencyValues {
     var animalAPIService: AnimalAPIServiceProtocol {
         get { self[AnimalAPIServiceKey.self] }
         set { self[AnimalAPIServiceKey.self] = newValue }
+    }
+
+    var coreDataService: CoreDataServiceProtocol {
+        get { self[CoreDataServiceKey.self] }
+        set { self[CoreDataServiceKey.self] = newValue }
     }
 }
 

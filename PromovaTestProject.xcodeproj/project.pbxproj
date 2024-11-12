@@ -33,9 +33,22 @@
 		9D5526702CE391BA0066887B /* PromovaTestProjectUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PromovaTestProjectUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		9D5526A62CE3A9E50066887B /* Exceptions for "PromovaTestProject" folder in "PromovaTestProject" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9D5526552CE391B80066887B /* PromovaTestProject */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9D5526582CE391B80066887B /* PromovaTestProject */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9D5526A62CE3A9E50066887B /* Exceptions for "PromovaTestProject" folder in "PromovaTestProject" target */,
+			);
 			path = PromovaTestProject;
 			sourceTree = "<group>";
 		};
@@ -408,6 +421,7 @@
 				DEVELOPMENT_TEAM = X8W7PK99DR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PromovaTestProject/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -437,6 +451,7 @@
 				DEVELOPMENT_TEAM = X8W7PK99DR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PromovaTestProject/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

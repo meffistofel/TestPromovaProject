@@ -14,12 +14,16 @@ struct AnimalHomeView: View {
 
     var body: some View {
         WithPerceptionTracking {
-            content
-                .ignoresSafeArea(edges: .bottom)
-                .alert($store.scope(state: \.destination?.alert, action: \.local.destination.alert))
-                .overlayEffect(store.isAdShowing)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.appBackground)
+            VStack(spacing: 0) {
+                content
+            }
+            .ignoresSafeArea(edges: .bottom)
+            .alert($store.scope(state: \.destination?.alert, action: \.local.destination.alert))
+            .overlayEffect(store.isAdShowing)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.appBackground)
+            .toastView(toast: $store.toast.sending(\.view.changeToastState))
+            .animation(.default, value: store.toast)
         }
     }
 }
@@ -31,10 +35,7 @@ private extension AnimalHomeView {
     var content: some View {
         switch store.viewState {
         case .empty:
-            Text("There are no new items\nplease try requesting later")
-                .font(.basicTitle)
-                .foregroundStyle(.appBlack)
-                .multilineTextAlignment(.center)
+            emptyStateView
         case .error(let error):
             VStack(spacing: 16) {
                 Image(systemName: "exclamationmark.triangle.fill")
@@ -44,14 +45,14 @@ private extension AnimalHomeView {
                     .font(.basicTitle)
             }
         case .fetched(let animals):
-            listView(animals: animals)
+            listView(animals: animals, isRedacted: false)
                 .refreshable {
                     send(.refreshDidEnd)
                 }
         case .loading:
-            listView(animals: .init(uniqueElements: Animal.mock(maxIndex: 10)))
-                .shimmer(when: true)
+            listView(animals: .init(uniqueElements: Animal.mock(maxIndex: 10)), isRedacted: true)
                 .allowsHitTesting(false)
+
         case .none:
             Text("")
                 .onAppear {
@@ -60,17 +61,40 @@ private extension AnimalHomeView {
         }
     }
 
-    func listView(animals: IdentifiedArrayOf<Animal>) -> some View {
-        List(animals) { animal in
-            AnimalListItem(model: .init(model: animal))
-                .onTapGesture {
-                    handleCellTap(with: animal)
+    var emptyStateView: some View {
+        VStack(spacing: 16) {
+            Text("There are no new items\nplease try requesting later")
+                .font(.basicTitle)
+                .foregroundStyle(.appBlack)
+                .multilineTextAlignment(.center)
+
+            Button {
+                send(.homeDidAppear)
+            } label: {
+                VStack(spacing: 16) {
+                    Image(systemName: "goforward")
+                    Text("Retry")
+                        .font(.basicSubTitle)
                 }
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
+            }
+            .opacity(store.toast == nil ? 1 : 0)
         }
-        .scrollContentBackground(.hidden)
-        .listStyle(.plain)
+    }
+
+    func listView(animals: IdentifiedArrayOf<Animal>, isRedacted: Bool) -> some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                ForEach(animals) { animal in
+                    AnimalListItem(model: .init(model: animal))
+                        .onTapGesture {
+                            handleCellTap(with: animal)
+                        }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top)
+            .shimmer(when: isRedacted)
+        }
         .padding(.top, 1)
     }
 }

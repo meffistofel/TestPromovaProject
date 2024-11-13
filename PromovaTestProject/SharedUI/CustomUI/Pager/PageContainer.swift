@@ -128,7 +128,6 @@ struct PageContainer<
                             // horizontal padding scroll view
                             .padding(.bottom, pagerConfig.listConfig.listVerticalPadding.bottom)
                             .padding(.bottom, pagerConfig.listConfig.listVerticalPadding.top)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                         }
 
                         listFooter(model)
@@ -139,7 +138,6 @@ struct PageContainer<
                         pagerConfig.setCardHeight(with: $0.height)
                     }
                     .frame(width: geo.size.width)
-                    // paddings for top and bottom cards required for correct pagination calculation
                     .padding(.leading, pagerConfig.listConfig.listHorizontalPadding.leading)
                     .padding(.trailing, pagerConfig.listConfig.listHorizontalPadding.trailing)
                     .background {

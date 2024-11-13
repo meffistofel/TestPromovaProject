@@ -37,7 +37,9 @@ struct AsyncImageApp: View {
                 Image(systemName: "questionmark.circle.fill")
                     .resizable()
             } else {
-                ProgressView().progressViewStyle(.circular)
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .frame(width: width, height: height)

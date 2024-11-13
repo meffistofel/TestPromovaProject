@@ -21,6 +21,7 @@ struct AnimalDetailView: View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
                 header
+                #warning("TODO: This is an approach that I developed independently a year ago, inspired by various data, the disadvantages are that it is difficult to work out lazy states, but due to the limited time for execution, it is the best that I can offer,")
                 PageContainer(
                     currentIndex: $store.currentIndex.sending(\.view.changeIndexWithSwipe),
                     listItem: store.content.elements,
@@ -35,6 +36,7 @@ struct AnimalDetailView: View {
                             .foregroundStyle(.appBlack)
                             .multilineTextAlignment(.center)
                             .padding(.bottom, 16)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                     },
                     listFooter: { model in
                         let backwardIsAvailable = model.index > 0
@@ -77,8 +79,8 @@ extension AnimalDetailView {
 
             }
             .overlay(alignment: .trailingLastTextBaseline) {
-                let currentItem = store.content[store.currentIndex]
-
+                let currentItem = store.currentItem
+                
                 ShareLink(
                     item: currentItem.image,
                     subject: Text(store.category),
@@ -97,8 +99,6 @@ extension AnimalDetailView {
                     .shadow(color: .appBlack.opacity(0.25), radius: 4, x: 0, y: 4)
             }
             .zIndex(1000)
-
-
     }
 }
 

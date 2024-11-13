@@ -60,7 +60,7 @@ struct PagerConfig {
     }
 
     func calculateTotalCarouselWidth(proxy: GeometryProxy) -> CGFloat? {
-        proxy.size.width - cardHorizontalPadding <= 0 ? nil : proxy.size.width - cardHorizontalPadding * 2
+         proxy.size.width - cardHorizontalPadding <= 0 ? nil : max(0, proxy.size.width - cardHorizontalPadding * 2)
     }
 }
 

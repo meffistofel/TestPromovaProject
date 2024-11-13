@@ -11,7 +11,7 @@ import OSLog
 
 private let logger = Logger(subsystem: "PromovaTestProject", category: "NetworkMonitoringService")
 
-class NetworkMonitoringService: ObservableObject {
+final class NetworkMonitoringService: ObservableObject {
 
     @Published var isNetworkAvailable: Bool = true
 

@@ -1,5 +1,5 @@
 //
-//  Binding+Ext.swift
+//  Binding+Extension.swift
 //  PromovaTestProject
 //
 //  Created by Alex Kovalov on 11/11/24.

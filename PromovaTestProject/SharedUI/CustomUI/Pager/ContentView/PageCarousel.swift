@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 // MARK: - PageCarousel
 
 struct PageCarousel<Content: View, T: Identifiable>: View {
@@ -24,6 +25,7 @@ struct PageCarousel<Content: View, T: Identifiable>: View {
     private let list: [T]
 
     private let viewConfig: PagerConfig
+    private let coordinateSpaceName: String = "List"
 
     private var isZeroIndex: Bool {
         currentIndex == 0
@@ -63,6 +65,7 @@ struct PageCarousel<Content: View, T: Identifiable>: View {
                             }
                     }
                     .frame(width: viewConfig.calculateTotalCarouselWidth(proxy: proxy))
+
                 }
             }
             // Spacing will be horizontal padding...
@@ -71,6 +74,7 @@ struct PageCarousel<Content: View, T: Identifiable>: View {
             // setting only after 0th index..
             .offset(x: (CGFloat(currentIndex) * -width) + (!isZeroIndex ? adjustMentWidth : 0) + offset)
             .simultaneousGesture(viewConfig.isNeedGesture ? dragGesture(with: width) : nil)
+            .coordinateSpace(name: coordinateSpaceName)
         }
         // handle when change index from manual tap to page controller
         .onChange(of: index) { newIndex in
@@ -96,13 +100,9 @@ extension PageCarousel {
             .onEnded({ value in
                 let roundIndex = updatingIndex(cardWidth: width, offsetX: value.translation.width)
 
-                print(value.translation.width, roundIndex, max(min(currentIndex + Int(roundIndex), list.count - 1), 0)
-)
-
                 // setting min...
                 currentIndex = max(min(currentIndex + Int(roundIndex), list.count - 1), 0)
                 index = currentIndex
-
             })
     }
 }
@@ -123,7 +123,7 @@ private extension PageCarousel {
     }
 
     func getScale(proxy: GeometryProxy) -> CGFloat {
-        let x = proxy.frame(in: .global).minX
+        let x = proxy.frame(in: .named(coordinateSpaceName)).minX
 
         let diff = abs(x)
 
@@ -131,7 +131,9 @@ private extension PageCarousel {
             return 1
         }
 
-        return 1 + (100 - diff) / 2000
+        let result = 1 + (100 - diff) / 2000
+
+        return result
     }
 }
 

@@ -34,17 +34,8 @@ struct RootFeature {
         Reduce { state, action in
             switch action {
             case let .path(.element(id: _, action: action)):
-                switch action {
-
-                case .detailItem(let action):
-                    switch action {
-                    case .output(.onBackDidTap):
-                        return .send(.animalList(.input(.fetchAnimals)))
-                    default:
-                        return .none
-                    }
-                }
-            case let .animalList(.delegate(.onCellDidTap(detailState))):
+                return handleRootPath(action: action)
+            case let .animalList(.output(.onCellDidTap(detailState))):
                 state.path.append(.detailItem(detailState))
 
                 return .none
@@ -55,6 +46,19 @@ struct RootFeature {
             }
         }
         .forEach(\.path, action: \.path)
+    }
+
+    private func handleRootPath(action: RootFeature.Path.Action) -> Effect<Action> {
+        switch action {
+
+        case .detailItem(let action):
+            switch action {
+            case .output(.onBackDidTap):
+                return .send(.animalList(.input(.fetchAnimals)))
+            default:
+                return .none
+            }
+        }
     }
 }
 

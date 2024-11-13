@@ -9,14 +9,14 @@ import Dependencies
 import IdentifiedCollections
 
 protocol AnimalCachedServiceProtocol {
-    func fetchAnimals() async throws  -> IdentifiedArrayOf<Animal>
+    func fetchAnimals() async throws  -> (IdentifiedArrayOf<Animal>, Error?)
 }
 
-class AnimalCachedService: AnimalCachedServiceProtocol {
+final class AnimalCachedService: AnimalCachedServiceProtocol {
     @Dependency(\.animalAPIService) private var animalAPIService
     @Dependency(\.coreDataService) private var coreDataService
 
-    func fetchAnimals() async throws  -> IdentifiedArrayOf<Animal> {
+    func fetchAnimals() async throws  -> (IdentifiedArrayOf<Animal>, Error?) {
         do {
             let animals = try await animalAPIService.fetchAnimals()
             let _ = animals.map { AnimalMO(context: coreDataService.backgroundObjectContext, animal: $0) }
@@ -26,14 +26,14 @@ class AnimalCachedService: AnimalCachedServiceProtocol {
             let sortedAnimals = animals.sorted(by: { $0.order < $1.order })
             let identifiedAnimals = IdentifiedArrayOf(uniqueElements: sortedAnimals)
 
-            return identifiedAnimals
+            return (identifiedAnimals, nil)
         } catch  {
             return try await coreDataService.backgroundObjectContext.perform { [weak self] in
                 let animalsMO = try self?.coreDataService.fetchInBackground(request: .animals()) ?? []
                 let animals = animalsMO.map(Animal.init)
                 let identifiedAnimals = IdentifiedArrayOf(uniqueElements: animals)
 
-                return identifiedAnimals
+                return (identifiedAnimals, error)
             }
         }
     }

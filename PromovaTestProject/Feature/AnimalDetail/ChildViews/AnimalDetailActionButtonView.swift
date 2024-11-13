@@ -12,11 +12,6 @@ private extension CGFloat {
 }
 
 struct AnimalDetailActionButtonView: View {
-    enum Event {
-        case didTapBackward
-        case didTapForward
-    }
-
     let backwardIsAvailable: Bool
     let forwardIsAvailable: Bool
 
@@ -53,8 +48,14 @@ struct AnimalDetailActionButtonView: View {
                 }
         }
     }
+}
 
-    enum Direction {
+extension AnimalDetailActionButtonView {
+    enum Event {
+        case didTapBackward
+        case didTapForward
+    }
+    private enum Direction {
         case back
         case forward
     }

@@ -8,9 +8,7 @@
 import CoreData
 
 @objc(AnimalContentMO)
-public class AnimalContentMO: NSManagedObject {
-
-}
+public class AnimalContentMO: NSManagedObject { }
 
 extension AnimalContentMO {
     convenience init(context: NSManagedObjectContext, content: AnimalContent) {

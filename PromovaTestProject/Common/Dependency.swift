@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import Foundation
 
 private enum NetworkServiceKey: DependencyKey {
     static let liveValue: NetworkServiceProtocol = NetworkingService()
@@ -25,6 +26,10 @@ private enum AnimalCachedServiceKey: DependencyKey {
 
 private enum CoreDataServiceKey: DependencyKey {
     static let liveValue: CoreDataServiceProtocol = CoreDataService()
+}
+
+private enum URLSessionKey: DependencyKey {
+    static let liveValue: URLSession = URLSession.defaultAppSession
 }
 
 extension DependencyValues {
@@ -51,6 +56,11 @@ extension DependencyValues {
     var animalCachedService: AnimalCachedServiceProtocol {
         get { self[AnimalCachedServiceKey.self] }
         set { self[AnimalCachedServiceKey.self] = newValue }
+    }
+
+    var urlSession: URLSession {
+        get { self[URLSessionKey.self] }
+        set { self[URLSessionKey.self] = newValue }
     }
 }
 

@@ -18,19 +18,23 @@ struct AnimalHomeFeature {
         var isAdShowing: Bool = false
         var viewState: ViewState = .none
         var animalDetail: AnimalDetailFeature.State?
+        var toast: Toast?
     }
 
     enum Action: ViewAction {
         @CasePathable
         enum Local {
-            case animalResponse(Result<IdentifiedArrayOf<Animal>, Error>)
+            case animalResponse(Result<(items: IdentifiedArrayOf<Animal>, error: Error?), Error>)
             case destination(PresentationAction<Destination.Action>)
             case startAd
             case finishAd(String, [AnimalContent])
         }
 
+        @CasePathable
         enum View {
+            case changeToastState(Toast?)
             case homeDidAppear
+            case retryDidTap
             case refreshDidEnd
             case didTapToPaidContent(String, [AnimalContent])
             case didTapToComingSoonContent
@@ -50,7 +54,7 @@ struct AnimalHomeFeature {
         }
 
         case input(Input)
-        case delegate(Output)
+        case output(Output)
         case view(View)
         case local(Local)
     }
@@ -78,7 +82,7 @@ struct AnimalHomeFeature {
                 return handleInput(action: action, state: &state)
             case let .local(action):
                 return handleLocal(action: action, state: &state)
-            case .delegate:
+            case .output:
                 return .none
             }
         }
@@ -90,7 +94,15 @@ struct AnimalHomeFeature {
 private extension AnimalHomeFeature {
     func handleView(action: Action.View, state: inout State) -> Effect<Action> {
         switch action {
-        case .homeDidAppear, .refreshDidEnd:
+        case .retryDidTap:
+            state.viewState = .loading
+
+            return fetchAnimals()
+        case .homeDidAppear:
+            state.viewState = .loading
+
+            return fetchAnimals()
+        case .refreshDidEnd:
             return fetchAnimals()
         case let .didTapToPaidContent(category, content):
             state.destination = .alert(.showAD(category: category, animalContent: content))
@@ -98,6 +110,11 @@ private extension AnimalHomeFeature {
             return .none
         case .didTapToComingSoonContent:
             state.destination = .alert(.comingSoon)
+
+            return .none
+
+        case let .changeToastState(toast):
+            state.toast = toast
 
             return .none
         case let .cellDidTap(category, content):
@@ -114,12 +131,16 @@ private extension AnimalHomeFeature {
 
     func handleLocal(action: Action.Local, state: inout State) -> Effect<Action> {
         switch action {
-        case .animalResponse(.success(let animals)):
-            state.viewState = animals.isEmpty ? .empty : .fetched(animals)
+        case let .animalResponse(.success(tuple)):
+            if let error = tuple.error {
+                state.toast = .init(style: .error, message: error.localizedDescription)
+            }
+
+            state.viewState = tuple.items.isEmpty ? .empty : .fetched(tuple.items)
 
             return .none
 
-        case .animalResponse(.failure(let error)):
+        case let .animalResponse(.failure(error)):
             state.viewState = .error(error.localizedDescription)
 
             return .none
@@ -152,7 +173,7 @@ private extension AnimalHomeFeature {
         let detailState = AnimalDetailFeature.State(category: category, content: .init(uniqueElements: content))
         state.animalDetail = detailState
 
-        return .send(.delegate(.onCellDidTap(detailState)))
+        return .send(.output(.onCellDidTap(detailState)))
     }
 
     func fetchAnimals() -> Effect<Action> {

@@ -8,5 +8,6 @@
 import Dependencies
 
 struct AnimalHomeEnvironment {
+    @Dependency(\.continuousClock) var clock
     @Dependency(\.animalCachedService) var animalCachedService
 }

@@ -13,9 +13,11 @@ struct AnimalDetailFeature {
     struct State: Equatable {
         let content: [AnimalContent]
     }
+    
     enum Action {
         case none
     }
+
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in

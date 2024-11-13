@@ -9,12 +9,14 @@ import SwiftUI
 import ComposableArchitecture
 
 struct AnimalHomeView: View {
-    let store: StoreOf<AnimalHomeFeature>
+    @Perception.Bindable var store: StoreOf<AnimalHomeFeature>
 
     var body: some View {
         WithPerceptionTracking {
             content
                 .ignoresSafeArea(edges: .bottom)
+                .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
+                .overlayEffect(store.state.isAdShowing)
         }
     }
 }
@@ -58,9 +60,7 @@ private extension AnimalHomeView {
         List(animals) { animal in
             AnimalListItem(model: .init(model: animal))
                 .onTapGesture {
-                    if let content = animal.content {
-                        store.send(.delegate(.cellDidTap(content)))
-                    }
+                    handleCellTap(with: animal)
                 }
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
@@ -68,6 +68,23 @@ private extension AnimalHomeView {
         .scrollContentBackground(.hidden)
         .listStyle(.plain)
         .padding(.top, 1)
+    }
+}
+
+extension AnimalHomeView {
+    private func handleCellTap(with animal: Animal) {
+
+        guard let content = animal.content else {
+            store.send(.didTapToComingSoonContent)
+            return
+        }
+
+        guard animal.status.isAvailable else {
+            store.send(.didTapToPaidContent(content))
+            return
+        }
+
+        store.send(.delegate(.cellDidTap(content)))
     }
 }
 

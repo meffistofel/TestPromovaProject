@@ -16,7 +16,9 @@ struct AnimalHomeView: View {
             content
                 .ignoresSafeArea(edges: .bottom)
                 .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
-                .overlayEffect(store.state.isAdShowing)
+                .overlayEffect(store.isAdShowing)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.appBackground)
         }
     }
 }
@@ -28,9 +30,10 @@ private extension AnimalHomeView {
     var content: some View {
         switch store.viewState {
         case .empty:
-            Text("There are no new items, please try requesting later")
+            Text("There are no new items\nplease try requesting later")
                 .font(.basicTitle)
                 .foregroundStyle(.appBlack)
+                .multilineTextAlignment(.center)
         case .error(let error):
             VStack(spacing: 16) {
                 Image(systemName: "exclamationmark.triangle.fill")
@@ -80,11 +83,11 @@ extension AnimalHomeView {
         }
 
         guard animal.status.isAvailable else {
-            store.send(.didTapToPaidContent(content))
+            store.send(.didTapToPaidContent(animal.title, content))
             return
         }
 
-        store.send(.delegate(.cellDidTap(content)))
+        store.send(.cellDidTap(animal.title, content))
     }
 }
 

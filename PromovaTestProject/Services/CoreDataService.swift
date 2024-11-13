@@ -84,14 +84,3 @@ extension CoreDataService {
         try backgroundObjectContext.save()
     }
 }
-
-// MARK: - Preview
-extension CoreDataService {
-
-    static var preview: CoreDataService = {
-        let controller = CoreDataService(inMemory: true)
-
-        return controller
-    }()
-}
-

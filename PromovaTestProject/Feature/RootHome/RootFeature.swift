@@ -11,17 +11,12 @@ import ComposableArchitecture
 struct RootFeature {
     @ObservableState
     struct State: Equatable {
-        var path = StackState<Path.State>()
+        var path = StackState<AnimalDetailFeature.State>()
         var animalList = AnimalHomeFeature.State()
     }
     enum Action {
         case animalList(AnimalHomeFeature.Action)
-        case path(StackActionOf<Path>)
-    }
-
-    @Reducer(state: .equatable)
-    enum Path {
-        case detailItem(AnimalDetailFeature)
+        case path(StackAction<AnimalDetailFeature.State, AnimalDetailFeature.Action>)
     }
 
     static var initialStore: StoreOf<Self> = .init(initialState: Self.State()) { Self() }
@@ -32,16 +27,24 @@ struct RootFeature {
         }
         Reduce { state, action in
             switch action {
-            case .path:
-                return .none
-            case let .animalList(.delegate(.cellDidTap(animalContent))):
-                state.path.append(.detailItem(AnimalDetailFeature.State(content: animalContent)))
+            case let .path(.element(id: _, action: .output(action))):
+                switch action {
+                case .onBackDidTap:
+                    return .send(.animalList(.input(.fetchAnimals)))
+                }
+            case let .animalList(.delegate(.onCellDidTap(detailState))):
+                state.path.append(detailState)
+
                 return .none
             case .animalList:
                 return .none
+            case .path:
+                return .none
             }
         }
-        .forEach(\.path, action: \.path)
+        .forEach(\.path, action: \.path) {
+            AnimalDetailFeature()
+        }
     }
 }
 

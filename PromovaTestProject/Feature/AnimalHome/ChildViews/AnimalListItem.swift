@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-extension CGFloat {
+private extension CGFloat {
     static let imageWidth: CGFloat = .relative(to: .width, value: 121)
     static let cellHeight: CGFloat = .relative(to: .height, value: 90)
     static let cellCornerRadius: CGFloat = 6
@@ -34,7 +34,6 @@ struct AnimalListItem: View {
                 if !model.isAvailable {
                     lockView
                         .padding(.leading, 12)
-
                 }
             }
             .padding(.top, 5)

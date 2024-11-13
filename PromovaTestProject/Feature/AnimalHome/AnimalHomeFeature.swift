@@ -17,33 +17,55 @@ struct AnimalHomeFeature {
         @Presents var destination: Destination.State?
         var isAdShowing: Bool = false
         var viewState: ViewState = .none
+        var animalDetail: AnimalDetailFeature.State?
     }
-    
+
+    @CasePathable
     enum Action {
+        case animalDetail(AnimalDetailFeature.Action)
+        case input(Input)
         case delegate(Delegate)
         case homeDidAppear
         case refreshDidEnd
-        case didTapToPaidContent([AnimalContent])
+        case didTapToPaidContent(String, [AnimalContent])
         case didTapToComingSoonContent
         case animalResponse(Result<IdentifiedArrayOf<Animal>, Error>)
         case destination(PresentationAction<Destination.Action>)
         case startAd
-        case finishAd
+        case finishAd(String, [AnimalContent])
+        case cellDidTap(String, [AnimalContent])
+
+        enum Input {
+            case fetchAnimals
+        }
+
+        enum Delegate: Equatable {
+            case onCellDidTap(AnimalDetailFeature.State)
+        }
 
         enum Alert: Equatable {
-            case showAD([AnimalContent])
+            case showAD(String, [AnimalContent])
         }
+    }
+
+    @Reducer(state: .equatable)
+    enum Destination {
+        case alert(AlertState<AnimalHomeFeature.Action.Alert>)
+    }
+
+    enum ViewState: Equatable {
+        case none
+        case empty
+        case loading
+        case error(String)
+        case fetched(IdentifiedArrayOf<Animal>)
     }
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .homeDidAppear, .refreshDidEnd:
-                return .run { send in
-                    try await send(.animalResponse(.success(environment.animalCachedService.fetchAnimals())))
-                } catch: { error, send in
-                    await send(.animalResponse(.failure(error)))
-                }
+            case .homeDidAppear, .refreshDidEnd, .input(.fetchAnimals):
+                return fetchAnimals()
             case .animalResponse(.success(let animals)):
                 state.viewState = animals.isEmpty ? .empty : .fetched(animals)
 
@@ -54,68 +76,70 @@ struct AnimalHomeFeature {
 
                 return .none
 
-            case let .didTapToPaidContent(content):
-                state.destination = .alert(.showAD(animalContent: content))
+            case let .didTapToPaidContent(category, content):
+                state.destination = .alert(.showAD(category: category, animalContent: content))
                 return .none
 
             case .didTapToComingSoonContent:
                 state.destination = .alert(.comingSoon)
                 return .none
 
-            case let .destination(.presented(.alert(.showAD(content)))):
+            case let .destination(.presented(.alert(.showAD(category, content)))):
                 return .run { send in
                     await send(.startAd)
                     try? await environment.clock.sleep(for: .seconds(2))
-                    await send(.finishAd)
-                    await send(.delegate(.cellDidTap(content)))
+                    await send(.finishAd(category, content))
                 }
             case .startAd:
                 state.isAdShowing = true
 
                 return .none
 
-            case .finishAd:
+            case let .finishAd(category, content):
                 state.isAdShowing = false
-
-                return .none
+                return createDetailFeature(category: category, content: content, state: &state)
 
             case .destination:
                 return .none
 
             case .delegate:
                 return .none
+
+            case .animalDetail(.output(.onBackDidTap)):
+                return fetchAnimals()
+
+            case .animalDetail:
+                return .none
+
+            case let .cellDidTap(category, content):
+                return createDetailFeature(category: category, content: content, state: &state)
             }
         }
         .ifLet(\.$destination, action: \.destination)
     }
-}
 
-extension AnimalHomeFeature {
+    private func createDetailFeature(category: String, content: [AnimalContent], state: inout State) -> Effect<Action> {
+        let detailState = AnimalDetailFeature.State(category: category, content: .init(uniqueElements: content))
+        state.animalDetail = detailState
 
-    @Reducer(state: .equatable)
-    enum Destination {
-        case alert(AlertState<AnimalHomeFeature.Action.Alert>)
+        return .send(.delegate(.onCellDidTap(detailState)))
     }
 
-    enum Delegate: Equatable {
-        case cellDidTap([AnimalContent])
-    }
-
-    enum ViewState: Equatable {
-        case none
-        case empty
-        case loading
-        case error(String)
-        case fetched(IdentifiedArrayOf<Animal>)
+    private func fetchAnimals() -> Effect<Action> {
+        .run { send in
+            try await send(.animalResponse(.success(environment.animalCachedService.fetchAnimals())))
+        } catch: { error, send in
+            await send(.animalResponse(.failure(error)))
+        }
     }
 }
 
 extension AlertState where Action == AnimalHomeFeature.Action.Alert {
-    static func showAD(animalContent: [AnimalContent]) -> Self {
+    static func showAD(category: String, animalContent: [AnimalContent]) -> Self {
         Self {
             TextState("Watch Ad to continue and Cancel")
         } actions: {
-            ButtonState(action: .showAD(animalContent)) {
+            ButtonState(action: .showAD(category, animalContent)) {
                 TextState("Show Ad")
             }
 

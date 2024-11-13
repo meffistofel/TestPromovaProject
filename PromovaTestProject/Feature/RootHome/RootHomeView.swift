@@ -18,16 +18,8 @@ struct RootHomeView: View {
                 path: $store.scope(state: \.path, action: \.path)) {
                     AnimalHomeView(store: store.scope(state: \.animalList, action: \.animalList))
                 } destination: {
-                    destinationView(store: $0)
+                    AnimalDetailView(store: $0)
                 }
-        }
-    }
-
-    @ViewBuilder
-    private func destinationView(store: Store<RootFeature.Path.State, RootFeature.Path.Action>) -> some View {
-        switch store.case {
-        case .detailItem(let store):
-            AnimalDetailView(store: store)
         }
     }
 }

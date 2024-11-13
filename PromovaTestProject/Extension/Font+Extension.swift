@@ -89,6 +89,12 @@ extension View {
 
 extension Font {
 
+    /// Basic regular 18px
+    static let basicFact = font(type: .basic, weight: .regular, size: 18)
+
+    /// Basic regular 17px
+    static let basicNavigationTitle = font(type: .basic, weight: .regular, size: 17)
+
     /// Basic regular 16px
     static let basicTitle = font(type: .basic, weight: .regular, size: 16)
 

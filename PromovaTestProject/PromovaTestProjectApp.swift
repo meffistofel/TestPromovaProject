@@ -18,18 +18,3 @@ struct PromovaTestProjectApp: App {
         }
     }
 }
-
-private extension PromovaTestProjectApp {
-
-  func setup() {
-    let backImage = UIImage.iconArrow.withRenderingMode(.alwaysTemplate)
-
-    let appearance = UINavigationBarAppearance()
-    appearance.setBackIndicatorImage(backImage, transitionMaskImage: backImage)
-    appearance.backButtonAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.clear]
-
-    UINavigationBar.appearance().standardAppearance = appearance
-    UINavigationBar.appearance().compactAppearance = appearance
-    UINavigationBar.appearance().compactScrollEdgeAppearance = appearance
-  }
-}

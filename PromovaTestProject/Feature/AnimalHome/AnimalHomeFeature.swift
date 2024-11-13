@@ -191,7 +191,8 @@ private extension AnimalHomeFeature {
 
     func fetchAnimalsFromAPI(delay: Double = 0) -> Effect<Action> {
         .run { send in
-            try await environment.clock.sleep(for: .seconds(2))
+#warning("TODO: Added delay for API call when retry without internet for better smooth UI")
+            try await environment.clock.sleep(for: .seconds(delay))
             try await send(.local(.animalAPIResponse(.success(environment.animalCachedService.fetchAnimalFromAPI()))))
         } catch: { error, send in
             await send(.local(.animalAPIResponse(.failure(error))))

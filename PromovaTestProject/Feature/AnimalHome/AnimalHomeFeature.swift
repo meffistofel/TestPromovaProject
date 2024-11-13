@@ -210,7 +210,7 @@ private extension AnimalHomeFeature {
 extension AlertState where Action == AnimalHomeFeature.Action.Alert {
     static func showAD(category: String, animalContent: [AnimalContent]) -> Self {
         Self {
-            TextState("Watch Ad to continue and Cancel")
+            TextState("Watch Ad to continue or Cancel")
         } actions: {
             ButtonState(action: .showAD(category, animalContent)) {
                 TextState("Show Ad")

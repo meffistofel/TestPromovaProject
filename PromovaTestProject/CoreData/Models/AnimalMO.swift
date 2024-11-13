@@ -19,8 +19,9 @@ public class AnimalMO: NSManagedObject {
         set { status = newValue.rawValue }
     }
 
-    var contentArray: [AnimalContentMO] {
-        contents?.allObjects as? [AnimalContentMO] ?? []
+    var contentArray: [AnimalContentMO]? {
+        let contentsArray = contents?.allObjects as? [AnimalContentMO]
+        return contentsArray?.isEmpty == false ? contentsArray : nil
     }
 }
 

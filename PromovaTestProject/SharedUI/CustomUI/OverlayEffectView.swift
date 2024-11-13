@@ -21,7 +21,7 @@ struct OverlayEffectModifier: ViewModifier {
 
                         ProgressView()
                             .progressViewStyle(.circular)
-                            .tint(.white)
+                            .tint(.appBlack)
                     }
                 }
             }

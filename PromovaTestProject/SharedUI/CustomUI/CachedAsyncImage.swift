@@ -36,10 +36,13 @@ struct AsyncImageApp: View {
             } else if phase.error != nil {
                 Image(systemName: "questionmark.circle.fill")
                     .resizable()
+                    .scaledToFit()
+                    .foregroundStyle(.appBlack)
             } else {
                 ProgressView()
                     .progressViewStyle(.circular)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .tint(.appBlack)
             }
         }
         .frame(width: width, height: height)

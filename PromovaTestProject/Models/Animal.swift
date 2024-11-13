@@ -60,7 +60,7 @@ extension Animal {
         image = animalMO.image ?? ""
         order = Int(animalMO.order)
         status = animalMO.statusEnum
-        content = animalMO.contentArray.map(AnimalContent.init)
+        content = animalMO.contentArray?.map { AnimalContent(animalContentMO: $0) }
     }
 }
 

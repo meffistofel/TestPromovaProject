@@ -15,6 +15,10 @@ struct PromovaTestProjectApp: App {
     var body: some Scene {
         WindowGroup {
             RootHomeView(store: Self.store)
+                .onAppear {
+                    UIRefreshControl.appearance().tintColor = .appBlack
+                    UIRefreshControl.appearance().attributedTitle = NSAttributedString("Refreshing…")
+                }
         }
     }
 }

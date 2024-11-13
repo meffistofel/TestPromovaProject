@@ -24,7 +24,9 @@ struct AnimalHomeFeature {
     enum Action: ViewAction {
         @CasePathable
         enum Local {
-            case animalResponse(Result<(items: IdentifiedArrayOf<Animal>, error: Error?), Error>)
+            case fetchAnimalsFromAPIFail
+            case animalDatabaseResponse(Result<IdentifiedArrayOf<Animal>, Error>)
+            case animalAPIResponse(Result<IdentifiedArrayOf<Animal>, Error>)
             case destination(PresentationAction<Destination.Action>)
             case startAd
             case finishAd(String, [AnimalContent])
@@ -97,13 +99,13 @@ private extension AnimalHomeFeature {
         case .retryDidTap:
             state.viewState = .loading
 
-            return fetchAnimals()
+            return fetchAnimalsFromAPI(delay: 1)
         case .homeDidAppear:
             state.viewState = .loading
 
-            return fetchAnimals()
+            return fetchAnimalsFromAPI()
         case .refreshDidEnd:
-            return fetchAnimals()
+            return fetchAnimalsFromAPI()
         case let .didTapToPaidContent(category, content):
             state.destination = .alert(.showAD(category: category, animalContent: content))
 
@@ -125,25 +127,36 @@ private extension AnimalHomeFeature {
     func handleInput(action: Action.Input, state: inout State) -> Effect<Action> {
         switch action {
         case .fetchAnimals:
-            return fetchAnimals()
+            return fetchAnimalsFromAPI()
         }
     }
 
     func handleLocal(action: Action.Local, state: inout State) -> Effect<Action> {
         switch action {
-        case let .animalResponse(.success(tuple)):
-            if let error = tuple.error {
-                state.toast = .init(style: .error, message: error.localizedDescription)
-            }
-
-            state.viewState = tuple.items.isEmpty ? .empty : .fetched(tuple.items)
+        case let .animalAPIResponse(.success(items)):
+            state.viewState = items.isEmpty ? .empty : .fetched(items)
 
             return .none
 
-        case let .animalResponse(.failure(error)):
+        case let .animalAPIResponse(.failure(error)):
+            state.toast = .init(style: .error, message: error.localizedDescription)
+
+            return .run { send in
+                await send(.local(.fetchAnimalsFromAPIFail))
+            }
+
+        case let .animalDatabaseResponse(.success(items)):
+            state.viewState = items.isEmpty ? .empty : .fetched(items)
+
+            return .none
+
+        case let .animalDatabaseResponse(.failure(error)):
             state.viewState = .error(error.localizedDescription)
 
             return .none
+
+        case .fetchAnimalsFromAPIFail:
+            return fetchAnimalsFromDatabase()
 
         case let .destination(.presented(.alert(.showAD(category, content)))):
             return .run { send in
@@ -151,6 +164,7 @@ private extension AnimalHomeFeature {
                 try? await environment.clock.sleep(for: .seconds(2))
                 await send(.local(.finishAd(category, content)))
             }
+            
         case .startAd:
             state.isAdShowing = true
 
@@ -175,11 +189,20 @@ private extension AnimalHomeFeature {
         return .send(.output(.onCellDidTap(detailState)))
     }
 
-    func fetchAnimals() -> Effect<Action> {
+    func fetchAnimalsFromAPI(delay: Double = 0) -> Effect<Action> {
         .run { send in
-            try await send(.local(.animalResponse(.success(environment.animalCachedService.fetchAnimals()))))
+            try await environment.clock.sleep(for: .seconds(2))
+            try await send(.local(.animalAPIResponse(.success(environment.animalCachedService.fetchAnimalFromAPI()))))
         } catch: { error, send in
-            await send(.local(.animalResponse(.failure(error))))
+            await send(.local(.animalAPIResponse(.failure(error))))
+        }
+    }
+
+    func fetchAnimalsFromDatabase() -> Effect<Action> {
+        .run { send in
+            try await send(.local(.animalDatabaseResponse(.success(environment.animalCachedService.fetchAnimalFromDataBase()))))
+        } catch: { error, send in
+            await send(.local(.animalDatabaseResponse(.failure(error))))
         }
     }
 }

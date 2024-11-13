@@ -41,7 +41,10 @@ private enum AnimalCachedServiceKey: DependencyKey {
     static var liveValue: AnimalCachedServiceInterface {
         let animalCacheService = AnimalCachedService()
 
-        return AnimalCachedServiceInterface(fetchAnimals: animalCacheService.fetchAnimals)
+        return AnimalCachedServiceInterface(
+            fetchAnimalFromAPI: animalCacheService.fetchAnimalFromAPI,
+            fetchAnimalFromDataBase: animalCacheService.fetchAnimalFromDataBase
+        )
     }
 }
 

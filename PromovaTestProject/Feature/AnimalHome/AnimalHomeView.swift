@@ -85,7 +85,7 @@ private extension AnimalHomeView {
         ScrollView {
             VStack(spacing: 16) {
                 ForEach(animals) { animal in
-                    AnimalListItem(model: .init(model: animal))
+                    AnimalListItem(model: .init(model: animal), isRedacted: isRedacted)
                         .onTapGesture {
                             handleCellTap(with: animal)
                         }

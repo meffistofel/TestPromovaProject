@@ -47,9 +47,6 @@ struct ToastModifier: ViewModifier {
         Spacer()
       }
       .transition(.move(edge: .top))
-      //.transition(AnyTransition.opacity.animation(.linear))
-      //.transition(AnyTransition.scale.animation(.linear))
-      //.transition(AnyTransition.opacity.animation(.easeInOut(duration: 0.1)))
     }
   }
 

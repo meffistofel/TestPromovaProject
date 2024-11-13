@@ -49,6 +49,7 @@ struct AnimalDetailFeature {
             switch action {
             case let .local(action):
                 return handleLocal(action: action, state: &state)
+                
             case let .view(action):
                 return handleView(action: action, state: &state)
 

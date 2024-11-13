@@ -12,7 +12,7 @@ struct ToastView: View {
     var style: ToastStyle
     var message: String
     var width = CGFloat.infinity
-    var onCancelTapped: (() -> Void)
+    var onCancelTapped: () -> Void
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
@@ -21,7 +21,6 @@ struct ToastView: View {
             Text(message)
                 .foregroundStyle(.appBlack)
                 .font(Font.caption)
-                .foregroundColor(Color("toastForeground"))
 
             Spacer(minLength: 10)
 
@@ -34,13 +33,10 @@ struct ToastView: View {
         }
         .padding()
         .frame(minWidth: 0, maxWidth: width)
-        .background(Color("toastBackground"))
         .cornerRadius(8)
         .background(
             RoundedRectangle(cornerRadius: 8)
-            //.stroke(style.themeColor, lineWidth: 0.5)
                 .fill(.appWhite, strokeBorder: style.themeColor, lineWidth: 1)
-            //.glow(color: style.themeColor, radius: 4)
         )
         .padding(.horizontal, 16)
     }

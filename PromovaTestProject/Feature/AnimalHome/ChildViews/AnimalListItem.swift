@@ -17,13 +17,20 @@ private extension CGFloat {
 struct AnimalListItem: View {
 
     let model: Model
+    let isRedacted: Bool
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            AsyncImageApp(
-                url: model.image,
-                width: .imageWidth
-            )
+#warning("Todo: Fix bug with redacted and iOS 18.1")
+            if isRedacted {
+                Color.appSubtitle
+                    .frame(width: .imageWidth)
+            } else {
+                AsyncImageApp(
+                    url: model.image,
+                    width: .imageWidth
+                )
+            }
 
             VStack(alignment: .leading, spacing: 0) {
                 cardDescriptionView
@@ -113,7 +120,7 @@ extension AnimalListItem {
 }
 
 #Preview {
-    AnimalListItem(model: .mock)
+    AnimalListItem(model: .mock, isRedacted: false)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, 20)
         .background(.appBackground)

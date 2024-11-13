@@ -35,12 +35,15 @@ struct RootFeature {
             switch action {
             case let .path(.element(id: _, action: action)):
                 return handleRootPath(action: action)
+
             case let .animalList(.output(.onCellDidTap(detailState))):
                 state.path.append(.detailItem(detailState))
 
                 return .none
+
             case .animalList:
                 return .none
+
             case .path:
                 return .none
             }

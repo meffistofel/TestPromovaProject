@@ -9,20 +9,10 @@ import Foundation
 import CoreData
 import OSLog
 
-protocol CoreDataServiceProtocol {
-    var backgroundObjectContext: NSManagedObjectContext { get }
-
-    func fetch<T: NSManagedObject>(request: NSFetchRequest<T>) throws -> [T]?
-    func fetchInBackground<T: NSManagedObject>(request: NSFetchRequest<T>) throws -> [T]?
-    func numberOfElements<T: NSManagedObject>(for fetchRequest: NSFetchRequest<T>) throws -> Int
-    func saveChanges() throws
-    func saveBGChanges() throws
-}
-
 private let logger = Logger(subsystem: "PromovaTestProject", category: "CoreDataService")
 private let modelFileName: String = "Promova"
 
-final class CoreDataService: NSPersistentContainer, CoreDataServiceProtocol, @unchecked Sendable {
+final class CoreDataService: NSPersistentContainer, @unchecked Sendable {
 
     static let shared: CoreDataService = CoreDataService()
 

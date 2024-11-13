@@ -117,7 +117,7 @@ extension AnimalHomeView {
 }
 
 #Preview {
-    AnimalHomeView(store: .init(initialState: AnimalHomeFeature.State(viewState: .empty)) {
+    AnimalHomeView(store: .init(initialState: AnimalHomeFeature.State(viewState: .loading)) {
         AnimalHomeFeature()
     })
 }

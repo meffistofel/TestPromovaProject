@@ -8,11 +8,11 @@
 import Dependencies
 import IdentifiedCollections
 
-protocol AnimalCachedServiceProtocol {
-    func fetchAnimals() async throws  -> (IdentifiedArrayOf<Animal>, Error?)
+struct AnimalCachedServiceInterface {
+    var fetchAnimals: () async throws -> (IdentifiedArrayOf<Animal>, Error?)
 }
 
-final class AnimalCachedService: AnimalCachedServiceProtocol {
+final class AnimalCachedService {
     @Dependency(\.animalAPIService) private var animalAPIService
     @Dependency(\.coreDataService) private var coreDataService
 

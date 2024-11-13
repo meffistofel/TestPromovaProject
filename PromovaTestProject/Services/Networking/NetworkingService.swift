@@ -6,14 +6,9 @@
 //
 
 import Foundation
-import ComposableArchitecture
+import Dependencies
 
-protocol NetworkServiceProtocol: AnyObject {
-    @discardableResult
-    func call<T: Decodable>(_ resource: Resource) async throws -> T
-}
-
-final class NetworkingService: NetworkServiceProtocol {
+final class NetworkingService {
 
     @Dependency(\.urlSession) private var urlSession: URLSession
     @Dependency(\.networkMonitoringService) private var networkMonitoring: NetworkMonitoringService

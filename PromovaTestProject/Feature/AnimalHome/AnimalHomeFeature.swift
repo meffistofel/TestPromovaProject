@@ -160,7 +160,6 @@ private extension AnimalHomeFeature {
             state.isAdShowing = false
             return createDetailFeature(category: category, content: content, state: &state)
 
-
         case .destination:
             return .none
         }

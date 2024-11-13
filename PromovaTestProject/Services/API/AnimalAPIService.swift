@@ -7,11 +7,11 @@
 
 import ComposableArchitecture
 
-protocol AnimalAPIServiceProtocol {
-    func fetchAnimals() async throws -> [Animal]
+struct AnimalAPIServiceInterface {
+    var fetchAnimals: () async throws -> [Animal]
 }
 
-final class AnimalAPIService: AnimalAPIServiceProtocol {
+final class AnimalAPIService {
 
     @Dependency(\.networkService) private var networkService
 

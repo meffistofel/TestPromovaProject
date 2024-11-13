@@ -69,7 +69,7 @@ private extension AnimalHomeView {
                 .multilineTextAlignment(.center)
 
             Button {
-                send(.homeDidAppear)
+                send(.retryDidTap)
             } label: {
                 VStack(spacing: 16) {
                     Image(systemName: "goforward")

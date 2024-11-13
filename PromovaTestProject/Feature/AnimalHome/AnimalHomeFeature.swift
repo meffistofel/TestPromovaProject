@@ -20,32 +20,39 @@ struct AnimalHomeFeature {
         var animalDetail: AnimalDetailFeature.State?
     }
 
-    @CasePathable
-    enum Action {
-        case animalDetail(AnimalDetailFeature.Action)
-        case input(Input)
-        case delegate(Delegate)
-        case homeDidAppear
-        case refreshDidEnd
-        case didTapToPaidContent(String, [AnimalContent])
-        case didTapToComingSoonContent
-        case animalResponse(Result<IdentifiedArrayOf<Animal>, Error>)
-        case destination(PresentationAction<Destination.Action>)
-        case startAd
-        case finishAd(String, [AnimalContent])
-        case cellDidTap(String, [AnimalContent])
+    enum Action: ViewAction {
+        @CasePathable
+        enum Local {
+            case animalResponse(Result<IdentifiedArrayOf<Animal>, Error>)
+            case destination(PresentationAction<Destination.Action>)
+            case startAd
+            case finishAd(String, [AnimalContent])
+        }
+
+        enum View {
+            case homeDidAppear
+            case refreshDidEnd
+            case didTapToPaidContent(String, [AnimalContent])
+            case didTapToComingSoonContent
+            case cellDidTap(String, [AnimalContent])
+        }
 
         enum Input {
             case fetchAnimals
         }
 
-        enum Delegate: Equatable {
+        enum Output: Equatable {
             case onCellDidTap(AnimalDetailFeature.State)
         }
 
         enum Alert: Equatable {
             case showAD(String, [AnimalContent])
         }
+
+        case input(Input)
+        case delegate(Output)
+        case view(View)
+        case local(Local)
     }
 
     @Reducer(state: .equatable)
@@ -64,72 +71,95 @@ struct AnimalHomeFeature {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .homeDidAppear, .refreshDidEnd, .input(.fetchAnimals):
-                return fetchAnimals()
-            case .animalResponse(.success(let animals)):
-                state.viewState = animals.isEmpty ? .empty : .fetched(animals)
-
-                return .none
-
-            case .animalResponse(.failure(let error)):
-                state.viewState = .error(error.localizedDescription)
-
-                return .none
-
-            case let .didTapToPaidContent(category, content):
-                state.destination = .alert(.showAD(category: category, animalContent: content))
-                return .none
-
-            case .didTapToComingSoonContent:
-                state.destination = .alert(.comingSoon)
-                return .none
-
-            case let .destination(.presented(.alert(.showAD(category, content)))):
-                return .run { send in
-                    await send(.startAd)
-                    try? await environment.clock.sleep(for: .seconds(2))
-                    await send(.finishAd(category, content))
-                }
-            case .startAd:
-                state.isAdShowing = true
-
-                return .none
-
-            case let .finishAd(category, content):
-                state.isAdShowing = false
-                return createDetailFeature(category: category, content: content, state: &state)
-
-            case .destination:
-                return .none
-
+#warning("TODO: it was possible to put it on onAppear, but it is less controlled, so the final approach depended on the specific need")
+            case let .view(action):
+                return handleView(action: action, state: &state)
+            case let .input(action):
+                return handleInput(action: action, state: &state)
+            case let .local(action):
+                return handleLocal(action: action, state: &state)
             case .delegate:
                 return .none
-
-            case .animalDetail(.output(.onBackDidTap)):
-                return fetchAnimals()
-
-            case .animalDetail:
-                return .none
-
-            case let .cellDidTap(category, content):
-                return createDetailFeature(category: category, content: content, state: &state)
             }
         }
-        .ifLet(\.$destination, action: \.destination)
+        .ifLet(\.$destination, action: \.local.destination)
+    }
+}
+
+// MARK: Handle Events
+private extension AnimalHomeFeature {
+    func handleView(action: Action.View, state: inout State) -> Effect<Action> {
+        switch action {
+        case .homeDidAppear, .refreshDidEnd:
+            return fetchAnimals()
+        case let .didTapToPaidContent(category, content):
+            state.destination = .alert(.showAD(category: category, animalContent: content))
+
+            return .none
+        case .didTapToComingSoonContent:
+            state.destination = .alert(.comingSoon)
+
+            return .none
+        case let .cellDidTap(category, content):
+            return createDetailFeature(category: category, content: content, state: &state)
+        }
     }
 
-    private func createDetailFeature(category: String, content: [AnimalContent], state: inout State) -> Effect<Action> {
+    func handleInput(action: Action.Input, state: inout State) -> Effect<Action> {
+        switch action {
+        case .fetchAnimals:
+            return fetchAnimals()
+        }
+    }
+
+    func handleLocal(action: Action.Local, state: inout State) -> Effect<Action> {
+        switch action {
+        case .animalResponse(.success(let animals)):
+            state.viewState = animals.isEmpty ? .empty : .fetched(animals)
+
+            return .none
+
+        case .animalResponse(.failure(let error)):
+            state.viewState = .error(error.localizedDescription)
+
+            return .none
+
+        case let .destination(.presented(.alert(.showAD(category, content)))):
+            return .run { send in
+                await send(.local(.startAd))
+                try? await environment.clock.sleep(for: .seconds(2))
+                await send(.local(.finishAd(category, content)))
+            }
+        case .startAd:
+            state.isAdShowing = true
+
+            return .none
+
+        case let .finishAd(category, content):
+            state.isAdShowing = false
+            return createDetailFeature(category: category, content: content, state: &state)
+
+
+        case .destination:
+            return .none
+        }
+    }
+}
+
+// MARK: Methods
+private extension AnimalHomeFeature {
+    func createDetailFeature(category: String, content: [AnimalContent], state: inout State) -> Effect<Action> {
         let detailState = AnimalDetailFeature.State(category: category, content: .init(uniqueElements: content))
         state.animalDetail = detailState
 
         return .send(.delegate(.onCellDidTap(detailState)))
     }
 
-    private func fetchAnimals() -> Effect<Action> {
+    func fetchAnimals() -> Effect<Action> {
         .run { send in
-            try await send(.animalResponse(.success(environment.animalCachedService.fetchAnimals())))
+            try await send(.local(.animalResponse(.success(environment.animalCachedService.fetchAnimals()))))
         } catch: { error, send in
-            await send(.animalResponse(.failure(error)))
+            await send(.local(.animalResponse(.failure(error))))
         }
     }
 }

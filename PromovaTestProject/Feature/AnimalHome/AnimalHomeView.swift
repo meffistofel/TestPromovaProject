@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 
+@ViewAction(for: AnimalHomeFeature.self)
 struct AnimalHomeView: View {
     @Perception.Bindable var store: StoreOf<AnimalHomeFeature>
 
@@ -15,7 +16,7 @@ struct AnimalHomeView: View {
         WithPerceptionTracking {
             content
                 .ignoresSafeArea(edges: .bottom)
-                .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
+                .alert($store.scope(state: \.destination?.alert, action: \.local.destination.alert))
                 .overlayEffect(store.isAdShowing)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.appBackground)
@@ -45,7 +46,7 @@ private extension AnimalHomeView {
         case .fetched(let animals):
             listView(animals: animals)
                 .refreshable {
-                    store.send(.refreshDidEnd)
+                    send(.refreshDidEnd)
                 }
         case .loading:
             listView(animals: .init(uniqueElements: Animal.mock(maxIndex: 10)))
@@ -54,7 +55,7 @@ private extension AnimalHomeView {
         case .none:
             Text("")
                 .onAppear {
-                    store.send(.homeDidAppear)
+                    send(.homeDidAppear)
                 }
         }
     }
@@ -78,16 +79,16 @@ extension AnimalHomeView {
     private func handleCellTap(with animal: Animal) {
 
         guard let content = animal.content else {
-            store.send(.didTapToComingSoonContent)
+            send(.didTapToComingSoonContent)
             return
         }
 
         guard animal.status.isAvailable else {
-            store.send(.didTapToPaidContent(animal.title, content))
+            send(.didTapToPaidContent(animal.title, content))
             return
         }
 
-        store.send(.cellDidTap(animal.title, content))
+        send(.cellDidTap(animal.title, content))
     }
 }
 

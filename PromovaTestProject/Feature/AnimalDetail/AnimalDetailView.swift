@@ -69,7 +69,7 @@ extension AnimalDetailView {
             .frame(maxHeight: .relative(to: .height, value: 90), alignment: .bottom)
             .overlay(alignment: .leadingLastTextBaseline) {
                 Button {
-                    store.send(.view(.backDidTap))
+                    send(.backDidTap)
                 } label: {
                     Image(.iconArrow)
                 }
